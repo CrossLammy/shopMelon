@@ -86,7 +86,7 @@ int main() {
     };
 
     Cart myCart;
-    // Product::showAllProduct(storeProduct) <<- เอาไว้โชว์ item ทุกชิ้น
+    // Product::showAllProduct(storeProduct); <<- เอาไว้โชว์ item ทุกชิ้น
 
     int choice;
     while (true) {
