@@ -17,12 +17,12 @@ public:
         name = P_name;
         price = P_price;
     }
-    void displayProduct() const {
+    void displayProduct() const { // เอาไว้โชว์ 1 ชิ้น
         std::cout << "ID: " << left << setw(5) << id
                   << "| " << setw(30) << name
                   << "| Price: " << fixed << setprecision(2) << price << " Bath\n";
     }
-    static void showAllProduct(const vector<Product>& vecProduct) {
+    static void showAllProduct(const vector<Product>& vecProduct) { // // เอาไว้โชว์ทุกอัน
         cout << "================== STORE INVENTORY ==================" << endl;
         for (const auto& item : vecProduct) {
             item.displayProduct();
@@ -33,14 +33,14 @@ public:
 
 class Cart {
     public:
-    vector<Product> cartItems;
+    vector<Product> cartItems; // vector จะคล้าย array อันนี้ getter มาจาก product
 
-    void addProduct(Product p) {
+    void addProduct(Product p) { // for add ไอเทม
         cartItems.push_back(p);
         cout << ">> Added --> [" << p.name << "] to cart!\n";
     }
 
-    void removeProduct(int productId) {
+    void removeProduct(int productId) { //for remove
         for (auto it = cartItems.begin(); it != cartItems.end(); ++it) {
             if (it->id == productId) {
                 cout << ">> remove --> [" << it->name << "] form cart!\n";
@@ -51,7 +51,7 @@ class Cart {
         cout << ">> Cart is empty\n";
     }
 
-    void showCart() {
+    void showCart() { // show item in cart
         if (cartItems.empty()) {
             cout << ">> Cart is empty\n";
             return;
@@ -62,6 +62,8 @@ class Cart {
         }
         cout << "=====================================================\n";
     }
+
+
 };
 
 int main() {
@@ -84,15 +86,9 @@ int main() {
     };
 
     Cart myCart;
-    // // Admin myAdmin;
-    // // Checkout myCheckout;
-
-    // Product::showAllProduct(storeProduct)
-    // myCart.showCart();
+    // Product::showAllProduct(storeProduct) <<- เอาไว้โชว์ item ทุกชิ้น
 
     int choice;
-
-
     while (true) {
         cout << "\n================== SHOP MENU ==================\n";
         cout << "1. View product\n";
