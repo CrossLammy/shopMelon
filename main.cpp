@@ -66,6 +66,8 @@ class Cart {
 
 };
 
+//Class สร้างตรงนี้
+
 int main() {
     vector<Product> storeProducts = {
         Product(1, "MacBook Air M2", 34900.0),
@@ -148,7 +150,7 @@ int main() {
         } else if (choice==3) {
 
         } else if (choice==4) {
-
+            //Crad ใส่ตรงนี้
         } else if (choice==5) {
 
         } else if (choice==0) {
