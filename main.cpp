@@ -150,7 +150,7 @@ int main() {
         } else if (choice==3) {
 
         } else if (choice==4) {
-            //Crad ใส่ตรงนี้ อั้นนี้ของ Card!!! ดีจ้าาาาาthai
+            //Crad ใส่ตรงนี้ อั้นนี้ของ Card!!! ดีจ้าาาาาthailand
         } else if (choice==5) {
 
         } else if (choice==0) {
