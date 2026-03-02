@@ -163,7 +163,7 @@ int main() {
         } else if (choice==3) {
 
         } else if (choice==4) { //ส่วนที่เพิ่มเข้าไป ฟังชัน
-            Admin admin;
+           Admin admin;
     string u, p;
 
     cout << "\n========== ADMIN LOGIN ==========\n";
@@ -174,18 +174,22 @@ int main() {
 
     if (admin.login(u, p)) {
         cout << ">> Login successful! Welcome Admin.\n";
-
+    bool adminRunning = true;
+    while (adminRunning) {  // เพิ่ม loop ตรงนี้
         int adminChoice;
         cout << "\n[1] Random discount code\n";
         cout << "[2] Delete discount code\n";
         cout << "[3] View all discount codes\n";
-        cout << "[0] Back\n";
+        cout << "[0] lockout\n";
         cout << "Select menu: ";
         cin >> adminChoice;
 
         if (adminChoice == 1) {
             srand(time(0));
-            int discountPercent = (rand() % 31) + 10;
+            int discountPercent;
+            cout << "กรอกเปอร์เซ็นต์ส่วนลด: ";
+            cin >> discountPercent;
+
             int randomNumber = rand() % 10000;
             string discountCode = "SAVE" + to_string(discountPercent) + to_string(randomNumber);
 
@@ -196,8 +200,8 @@ int main() {
 
             ofstream file("discount_codes.txt", ios::app);
             if (file.is_open()) {
-                file << "Code: " << discountCode
-                     << " | Discount: " << discountPercent << "%\n";
+                file <<discountCode
+                     << "," << discountPercent << "\n";
                 file.close();
                 cout << ">> Saved to discount_codes.txt successfully!\n";
             } else {
@@ -220,10 +224,17 @@ int main() {
                 cout << "\n====== DISCOUNT CODES LIST ======\n";
                 int i = 1;
                 while (getline(fileIn, line)) {
-                    cout << "[" << i++ << "] " << line << "\n";
+                    int commaPos = line.find(',');
+                    if (commaPos != string::npos) {
+                        string code = line.substr(0, commaPos);
+                        string percent = line.substr(commaPos + 1);
+                        cout << "[" << i++ << "] Code: " << code << " | Discount: " << percent << "%\n";
+                    } else {
+                        cout << "[" << i++ << "] " << line << "\n";
+                    }
                     lines.push_back(line);
                 }
-                fileIn.close();
+                fileIn.close();  // ✅ ย้ายมาหลัง while getline
 
                 if (lines.empty()) {
                     cout << ">> No discount codes available.\n";
@@ -237,33 +248,23 @@ int main() {
 
                 if (delChoice >= 1 && delChoice <= (int)lines.size()) {
                     lines.erase(lines.begin() + delChoice - 1);
-
                     ofstream fileOut("discount_codes.txt");
                     if (fileOut.is_open()) {
-                        for (const string& l : lines) {
-                            fileOut << l << "\n";
-                        }
+                        for (const string& l : lines) fileOut << l << "\n";
                         fileOut.close();
                         cout << ">> Discount code deleted successfully!\n";
                     } else {
                         cout << ">> Error writing to file!\n";
                         break;
                     }
-
                     if (lines.empty()) {
                         cout << ">> No more discount codes available.\n";
                         break;
                     }
-
-                    cout << "\n[1] Delete another code\n";
-                    cout << "[0] Back\n";
-                    cout << "Select: ";
+                    cout << "\n[1] Delete another code\n[0] back\nSelect: ";
                     int continueChoice;
                     cin >> continueChoice;
-
-                    if (continueChoice != 1) {
-                        deletingMore = false;
-                    }
+                    if (continueChoice != 1) deletingMore = false;
 
                 } else if (delChoice == 0) {
                     cout << ">> Cancelled.\n";
@@ -273,7 +274,6 @@ int main() {
                 }
             }
         }
-
         else if (adminChoice == 3) {
             ifstream fileIn("discount_codes.txt");
             if (!fileIn.is_open()) {
@@ -281,10 +281,7 @@ int main() {
             } else {
                 vector<string> lines;
                 string line;
-
-                while (getline(fileIn, line)) {
-                    lines.push_back(line);
-                }
+                while (getline(fileIn, line)) lines.push_back(line);
                 fileIn.close();
 
                 if (lines.empty()) {
@@ -292,22 +289,27 @@ int main() {
                 } else {
                     cout << "\n====== ALL DISCOUNT CODES ======\n";
                     for (int i = 0; i < (int)lines.size(); i++) {
-                        cout << "[" << i + 1 << "] " << lines[i] << "\n";
+                        int commaPos = lines[i].find(',');
+                        if (commaPos != string::npos) {
+                            string code = lines[i].substr(0, commaPos);
+                            string percent = lines[i].substr(commaPos + 1);
+                            cout << "[" << i+1 << "] Code: " << code << " | Discount: " << percent << "%\n";
+                        } else {
+                            cout << "[" << i+1 << "] " << lines[i] << "\n";
+                        }
                     }
                     cout << "================================\n";
                 }
-
-                cout << "\n[0] Back\n";
-                cout << "Select: ";
+                cout << "\n[0] back\nSelect: ";
                 int viewChoice;
                 cin >> viewChoice;
-                // กด 0 หรืออะไรก็ตามจะกลับเมนู admin
             }
         }
-
         else if (adminChoice == 0) {
-            cout << ">> Back...\n";
+            cout << ">> Exit successful!:\n";
+            adminRunning = false;  // ✅ ออกจาก admin loop
         }
+    }
     }
         } else if (choice==5) {
 
