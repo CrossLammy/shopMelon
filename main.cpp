@@ -187,7 +187,7 @@ int main() {
         if (adminChoice == 1) {
             srand(time(0));
             int discountPercent;
-            cout << "กรอกเปอร์เซ็นต์ส่วนลด: ";
+            cout << "enter the discount percentage: ";
             cin >> discountPercent;
 
             int randomNumber = rand() % 10000;
