@@ -174,6 +174,9 @@ int main() {
 
     if (admin.login(u, p)) {
         cout << ">> Login successful! Welcome Admin.\n";
+    }else{
+        cout << ">> login filed -_-':\n";
+    
     bool adminRunning = true;
     while (adminRunning) {  // เพิ่ม loop ตรงนี้
         int adminChoice;
