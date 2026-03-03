@@ -173,10 +173,7 @@ int main() {
     cin >> p;
 
     if (admin.login(u, p)) {
-        cout << ">> Login successful! Welcome Admin.\n";
-    }else{
-        cout << ">> login filed -_-':\n";
-    
+        cout << ">> Login successful! Welcome Admin.\n";    
     bool adminRunning = true;
     while (adminRunning) {  // เพิ่ม loop ตรงนี้
         int adminChoice;
@@ -313,7 +310,11 @@ int main() {
             adminRunning = false;  // ✅ ออกจาก admin loop
         }
     }
-    }
+    } else {
+    // ← else ของ login อยู่ตรงนี้ หลัง while ปิดแล้ว
+    cout << ">> Login failed! Incorrect username or password.\n";
+}
+
         } else if (choice==5) {
 
         } else if (choice==0) {
