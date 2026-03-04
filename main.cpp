@@ -3,6 +3,7 @@
 #include <vector>
 #include <fstream>
 #include <iomanip>
+#include <limits> // เพิ่มไลบรารีนี้สำหรับจัดการ Input Buffer
 
 using namespace std;
 
@@ -22,7 +23,7 @@ public:
                   << "| " << setw(30) << name
                   << "| Price: " << fixed << setprecision(2) << price << " Bath\n";
     }
-    static void showAllProduct(const vector<Product>& vecProduct) { // // เอาไว้โชว์ทุกอัน
+    static void showAllProduct(const vector<Product>& vecProduct) { // เอาไว้โชว์ทุกอัน
         cout << "================== STORE INVENTORY ==================" << endl;
         for (const auto& item : vecProduct) {
             item.displayProduct();
@@ -33,14 +34,14 @@ public:
 
 class Cart {
     public:
-    vector<Product> cartItems; // vector จะคล้าย array อันนี้ getter มาจาก product
+    vector<Product> cartItems;
 
-    void addProduct(Product p) { // for add ไอเทม
+    void addProduct(Product p) { //add ของ
         cartItems.push_back(p);
         cout << ">> Added --> [" << p.name << "] to cart!\n";
     }
 
-    void removeProduct(int productId) { //for remove
+    void removeProduct(int productId) { //ลบของ
         for (auto it = cartItems.begin(); it != cartItems.end(); ++it) {
             if (it->id == productId) {
                 cout << ">> remove --> [" << it->name << "] form cart!\n";
@@ -48,10 +49,10 @@ class Cart {
                 return;
             }
         }
-        cout << ">> Cart is empty\n";
+        cout << ">> Cart is empty or Product not found in cart\n";
     }
 
-    void showCart() { // show item in cart
+    void showCart() { //show ของในตะกร้า
         if (cartItems.empty()) {
             cout << ">> Cart is empty\n";
             return;
@@ -60,10 +61,8 @@ class Cart {
         for (int i = 0; i < cartItems.size(); i++) {
             cout <<"ID: "<< cartItems[i].id <<" - " << cartItems[i].name << " (" << cartItems[i].price << " Bath)\n";
         }
-        cout << "=====================================================\n";
+        cout << "============================================\n";
     }
-
-
 };
 
 //Class Admin สร้างตรงนี้
@@ -88,7 +87,6 @@ int main() {
     };
 
     Cart myCart;
-    // Product::showAllProduct(storeProduct); <<- เอาไว้โชว์ item ทุกชิ้น
 
     int choice;
     while (true) {
@@ -100,14 +98,21 @@ int main() {
         cout << "0. Exit\n";
         cout << "Select menu : ";
         cin >> choice;
+
+        // --- ดักจับ Error หากผู้ใช้พิมพ์ตัวอักษรแทนตัวเลข (เมนูหลัก) ---
+        if (cin.fail()) {
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            cout << ">> Invalid input! Please enter a number.\n";
+            continue;
+        }
+
         if (choice == 1) {
             Product::showAllProduct(storeProducts);
         } else if (choice==2) {
 
             while (true) {
-
                 Product::showAllProduct(storeProducts);
-
                 myCart.showCart();
 
                 int shopChoice;
@@ -115,10 +120,26 @@ int main() {
                 cout << "Select menu : ";
                 cin >> shopChoice;
 
+                // --- ดักจับ Error หากผู้ใช้พิมพ์ตัวอักษรแทนตัวเลข (เมนูตะกร้า) ---
+                if (cin.fail()) {
+                    cin.clear();
+                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                    cout << ">> Invalid input! Please enter a number.\n";
+                    continue;
+                }
+
                 if (shopChoice == 1) {
                     int p_id;
                     cout << ">> Enter product ID: ";
                     cin >> p_id;
+
+                    // --- ดักจับ Error สำหรับการใส่รหัสสินค้า ---
+                    if (cin.fail()) {
+                        cin.clear();
+                        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                        cout << ">> Invalid ID! Please enter a number.\n";
+                        continue;
+                    }
 
                     bool found = false;
                     for (int i = 0; i < storeProducts.size(); i++) {
@@ -136,6 +157,13 @@ int main() {
                         int p_id;
                         cout << ">> Enter remove product : ";
                         cin >> p_id;
+
+                        if (cin.fail()) {
+                            cin.clear();
+                            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                            cout << ">> Invalid ID! Please enter a number.\n";
+                            continue;
+                        }
                         myCart.removeProduct(p_id);
                     }
 
@@ -149,8 +177,10 @@ int main() {
 
         } else if (choice==3) {
             //Cream and carrot ทำตรงนี้
+            cout << ">> Checkout system coming soon...\n";
         } else if (choice==4) {
-            //Crad ใส่ตรงนี้ อั้นนี้ของ Card!!! ดีจ้าาาาา
+            //Crad ใส่ตรงนี้ อันนี้ของ Card!!! ดีจ้าาาาา
+            cout << ">> Admin system coming soon...\n";
         }  else if (choice==0) {
             cout << ">> Close program...\n";
             break;
@@ -158,5 +188,5 @@ int main() {
             cout << ">> Please select the correct menu !!\n";
         }
     }
-
+    return 0;
 }
