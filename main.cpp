@@ -189,7 +189,7 @@ int main() {
             }
 
         } else if (choice == 3) {
-            // Cream and carrot ทำตรงนี้
+            // Cream and carrot ทำตรงนี้ <<---
             cout << ">> Checkout system coming soon...\n";
 
         } else if (choice == 4) {
