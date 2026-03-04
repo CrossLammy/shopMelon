@@ -22,7 +22,7 @@ public:
     }
     void displayProduct() const {
         std::cout << "ID: " << left << setw(5) << id
-                  << "| " << setw(30) << name
+                  << "| " << setw(30) << name //you
                   << "| Price: " << fixed << setprecision(2) << price << " Bath\n";
     }
     static void showAllProduct(const vector<Product>& vecProduct) {
