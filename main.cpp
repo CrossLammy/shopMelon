@@ -11,7 +11,7 @@ using namespace std;
 
 class Product {
 public:
-    int id; //hello
+    int id; 
     string name;
     double price;
 
