@@ -164,147 +164,262 @@ int main() {
 
         } else if (choice==4) { //ส่วนที่เพิ่มเข้าไป ฟังชัน
            Admin admin;
-    string u, p;
+string u, p;
 
-    cout << "\n========== ADMIN LOGIN ==========\n";
-    cout << "Username: ";
-    cin >> u;
-    cout << "Password: ";
-    cin >> p;
+cout << "\n========== ADMIN LOGIN ==========\n";
+cout << "Username: ";
+cin >> u;
+cout << "Password: ";
+cin >> p;
 
-    if (admin.login(u, p)) {
-        cout << ">> Login successful! Welcome Admin.\n";    
+if (admin.login(u, p)) {
+    cout << ">> Login successful! Welcome Admin.\n";
     bool adminRunning = true;
-    while (adminRunning) {  // เพิ่ม loop ตรงนี้
-        int adminChoice;
+    while (adminRunning) {
         cout << "\n[1] Random discount code\n";
         cout << "[2] Delete discount code\n";
         cout << "[3] View all discount codes\n";
-        cout << "[0] lockout\n";
-        cout << "Select menu: ";
-        cin >> adminChoice;
+        cout << "[0] Lockout\n";
 
+        // ✅ Validate adminChoice
+        int adminChoice = -1;
+        while (true) {
+            cout << "Select menu: ";
+            string inputStr;
+            cin >> inputStr;
+
+            bool isValid = !inputStr.empty();
+            for (char c : inputStr) {
+                if (!isdigit(c)) { isValid = false; break; }
+            }
+
+            if (!isValid) {
+                cout << ">> verify the number only!\n";
+                cout << "--------------------------\n";
+                continue;
+            }
+
+            adminChoice = stoi(inputStr);
+            if (adminChoice < 0 || adminChoice > 3) {
+                cout << ">> verify the number only 0 - 3!\n";
+                continue;
+            }
+            break;
+        }
         if (adminChoice == 1) {
-            srand(time(0));
-            int discountPercent;
-            cout << "enter the discount percentage: ";
-            cin >> discountPercent;
-
-            int randomNumber = rand() % 10000;
-            string discountCode = "SAVE" + to_string(discountPercent) + to_string(randomNumber);
-
-            cout << "\n====== DISCOUNT CODE GENERATED ======\n";
-            cout << "CODE: " << discountCode << endl;
-            cout << "Discount: " << discountPercent << "%\n";
-            cout << "=====================================\n";
-
-            ofstream file("discount_codes.txt", ios::app);
-            if (file.is_open()) {
-                file <<discountCode
-                     << "," << discountPercent << "\n";
-                file.close();
-                cout << ">> Saved to discount_codes.txt successfully!\n";
-            } else {
-                cout << ">> Error opening file!\n";
+    srand(time(0));
+    int discountPercent;
+    string inputStr;
+    
+    while (true) {
+        cout << "enter the discount percentage: ";
+        cin >> inputStr;
+        
+        // ตรวจสอบว่าทุกตัวอักษรเป็นตัวเลข
+        bool isValidNumber = !inputStr.empty();
+        for (char c : inputStr) {
+            if (!isdigit(c)) {
+                isValidNumber = false;
+                break;
             }
         }
+        
+        if (!isValidNumber) {
+            cout << ">> verify the number only!\n";
+            continue;
+        }
+        
+        discountPercent = stoi(inputStr);
+        
+        // ตรวจสอบช่วงที่ถูกต้อง (1-100)
+        if (discountPercent < 1 || discountPercent > 100) {
+            cout << ">> verify the number only 1 - 100!\n";
+            continue;
+        }
+        
+        break; // ผ่านการตรวจสอบทั้งหมด
+    }
 
+    int randomNumber = rand() % 10000;
+    string discountCode = "SAVE" + to_string(discountPercent) + to_string(randomNumber);
+
+    cout << "\n====== DISCOUNT CODE GENERATED ======\n";
+    cout << "CODE: " << discountCode << endl;
+    cout << "Discount: " << discountPercent << "%\n";
+    cout << "=====================================\n";
+
+    ofstream file("discount_codes.txt", ios::app);
+    if (file.is_open()) {
+        file << discountCode << "," << discountPercent << "\n";
+        file.close();
+        cout << ">> Saved to discount_codes.txt successfully!\n";
+    } else {
+        cout << ">> Error opening file!\n";
+    }
+}
         else if (adminChoice == 2) {
-            bool deletingMore = true;
-            while (deletingMore) {
-                ifstream fileIn("discount_codes.txt");
-                if (!fileIn.is_open()) {
-                    cout << ">> No discount codes found!\n";
-                    break;
-                }
-
-                vector<string> lines;
-                string line;
-
-                cout << "\n====== DISCOUNT CODES LIST ======\n";
-                int i = 1;
-                while (getline(fileIn, line)) {
-                    int commaPos = line.find(',');
-                    if (commaPos != string::npos) {
-                        string code = line.substr(0, commaPos);
-                        string percent = line.substr(commaPos + 1);
-                        cout << "[" << i++ << "] Code: " << code << " | Discount: " << percent << "%\n";
-                    } else {
-                        cout << "[" << i++ << "] " << line << "\n";
-                    }
-                    lines.push_back(line);
-                }
-                fileIn.close();  // ✅ ย้ายมาหลัง while getline
-
-                if (lines.empty()) {
-                    cout << ">> No discount codes available.\n";
-                    break;
-                }
-
-                cout << "=================================\n";
-                cout << "Enter line number to delete (0 to cancel): ";
-                int delChoice;
-                cin >> delChoice;
-
-                if (delChoice >= 1 && delChoice <= (int)lines.size()) {
-                    lines.erase(lines.begin() + delChoice - 1);
-                    ofstream fileOut("discount_codes.txt");
-                    if (fileOut.is_open()) {
-                        for (const string& l : lines) fileOut << l << "\n";
-                        fileOut.close();
-                        cout << ">> Discount code deleted successfully!\n";
-                    } else {
-                        cout << ">> Error writing to file!\n";
-                        break;
-                    }
-                    if (lines.empty()) {
-                        cout << ">> No more discount codes available.\n";
-                        break;
-                    }
-                    cout << "\n[1] Delete another code\n[0] back\nSelect: ";
-                    int continueChoice;
-                    cin >> continueChoice;
-                    if (continueChoice != 1) deletingMore = false;
-
-                } else if (delChoice == 0) {
-                    cout << ">> Cancelled.\n";
-                    deletingMore = false;
-                } else {
-                    cout << ">> Invalid selection.\n";
-                }
-            }
+    bool deletingMore = true;
+    while (deletingMore) {
+        ifstream fileIn("discount_codes.txt");
+        if (!fileIn.is_open()) {
+            cout << ">> No discount codes found!\n";
+            break;
         }
-        else if (adminChoice == 3) {
-            ifstream fileIn("discount_codes.txt");
-            if (!fileIn.is_open()) {
-                cout << ">> No discount codes found!\n";
+
+        vector<string> lines;
+        string line;
+
+        cout << "\n====== DISCOUNT CODES LIST ======\n";
+        int i = 1;
+        while (getline(fileIn, line)) {
+            int commaPos = line.find(',');
+            if (commaPos != string::npos) {
+                string code = line.substr(0, commaPos);
+                string percent = line.substr(commaPos + 1);
+                cout << "[" << i++ << "] Code: " << code << " | Discount: " << percent << "%\n";
             } else {
-                vector<string> lines;
-                string line;
-                while (getline(fileIn, line)) lines.push_back(line);
-                fileIn.close();
-
-                if (lines.empty()) {
-                    cout << ">> No discount codes available.\n";
-                } else {
-                    cout << "\n====== ALL DISCOUNT CODES ======\n";
-                    for (int i = 0; i < (int)lines.size(); i++) {
-                        int commaPos = lines[i].find(',');
-                        if (commaPos != string::npos) {
-                            string code = lines[i].substr(0, commaPos);
-                            string percent = lines[i].substr(commaPos + 1);
-                            cout << "[" << i+1 << "] Code: " << code << " | Discount: " << percent << "%\n";
-                        } else {
-                            cout << "[" << i+1 << "] " << lines[i] << "\n";
-                        }
-                    }
-                    cout << "================================\n";
-                }
-                cout << "\n[0] back\nSelect: ";
-                int viewChoice;
-                cin >> viewChoice;
+                cout << "[" << i++ << "] " << line << "\n";
             }
+            lines.push_back(line);
         }
+        fileIn.close();
+
+        if (lines.empty()) {
+            cout << ">> No discount codes available.\n";
+            break;
+        }
+
+        cout << "=================================\n";
+
+        // ✅ Validate delChoice
+        int delChoice = -1;
+        while (true) {
+            cout << "Enter line number to delete (0 to cancel): ";
+            string inputStr;
+            cin >> inputStr;
+
+            bool isValid = !inputStr.empty();
+            for (char c : inputStr) {
+                if (!isdigit(c)) { isValid = false; break; }
+            }
+
+            if (!isValid) {
+                cout << ">> verify the number only!\n";
+                continue;
+            }
+
+            delChoice = stoi(inputStr);
+            if (delChoice < 0 || delChoice > (int)lines.size()) {
+                cout << ">> verify the number only 0 - " << lines.size() << "!\n";
+                continue;
+            }
+            break;
+        }
+
+        if (delChoice >= 1 && delChoice <= (int)lines.size()) {
+            lines.erase(lines.begin() + delChoice - 1);
+            ofstream fileOut("discount_codes.txt");
+            if (fileOut.is_open()) {
+                for (const string& l : lines) fileOut << l << "\n";
+                fileOut.close();
+                cout << ">> Discount code deleted successfully!\n";
+            } else {
+                cout << ">> Error writing to file!\n";
+                break;
+            }
+            if (lines.empty()) {
+                cout << ">> No more discount codes available.\n";
+                break;
+            }
+
+            // ✅ Validate continueChoice
+            int continueChoice = -1;
+            while (true) {
+                cout << "\n[1] Delete another code\n[0] Back\nSelect: ";
+                string inputStr;
+                cin >> inputStr;
+
+                bool isValid = !inputStr.empty();
+                for (char c : inputStr) {
+                    if (!isdigit(c)) { isValid = false; break; }
+                }
+
+                if (!isValid) {
+                    cout << ">> verify the number only!\n";
+                    continue;
+                }
+
+                continueChoice = stoi(inputStr);
+                if (continueChoice != 0 && continueChoice != 1) {
+                    cout << ">> verify the number only 1 or 0!\n";
+                    continue;
+                }
+                break;
+            }
+
+            if (continueChoice != 1) deletingMore = false;
+
+        } else if (delChoice == 0) {
+            cout << ">> Cancelled.\n";
+            deletingMore = false;
+        } else {
+            cout << ">> Invalid selection.\n";
+        }
+    }
+}
+        else if (adminChoice == 3) {
+    ifstream fileIn("discount_codes.txt");
+    if (!fileIn.is_open()) {
+        cout << ">> No discount codes found!\n";
+    } else {
+        vector<string> lines;
+        string line;
+        while (getline(fileIn, line)) lines.push_back(line);
+        fileIn.close();
+
+        if (lines.empty()) {
+            cout << ">> No discount codes available.\n";
+        } else {
+            cout << "\n====== ALL DISCOUNT CODES ======\n";
+            for (int i = 0; i < (int)lines.size(); i++) {
+                int commaPos = lines[i].find(',');
+                if (commaPos != string::npos) {
+                    string code = lines[i].substr(0, commaPos);
+                    string percent = lines[i].substr(commaPos + 1);
+                    cout << "[" << i+1 << "] Code: " << code << " | Discount: " << percent << "%\n";
+                } else {
+                    cout << "[" << i+1 << "] " << lines[i] << "\n";
+                }
+            }
+            cout << "================================\n";
+        }
+
+        // ✅ Validate viewChoice
+        while (true) {
+            cout << "\n[0] Back\nSelect: ";
+            string inputStr;
+            cin >> inputStr;
+
+            bool isValid = !inputStr.empty();
+            for (char c : inputStr) {
+                if (!isdigit(c)) { isValid = false; break; }
+            }
+
+            if (!isValid) {
+                cout << ">> verify the number only!\n";
+                continue;
+            }
+
+            int viewChoice = stoi(inputStr);
+            if (viewChoice != 0) {
+                cout << ">> กverify the number only 0!\n";
+                continue;
+            }
+            break;
+        }
+    }
+}
+    
         else if (adminChoice == 0) {
             cout << ">> Exit successful!:\n";
             adminRunning = false;  // ✅ ออกจาก admin loop
