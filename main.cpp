@@ -430,8 +430,6 @@ if (admin.login(u, p)) {
     cout << ">> Login failed! Incorrect username or password.\n";
 }
 
-        } else if (choice==5) {
-
         } else if (choice==0) {
             cout << ">> Close program...\n";
             break;
