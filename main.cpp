@@ -189,9 +189,7 @@ int main() {
             }
 
         } else if (choice == 3) {
-            class Checkout{
-
-            };
+        
 
         } else if (choice == 4) {
             Admin admin;
