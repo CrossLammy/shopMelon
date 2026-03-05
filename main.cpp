@@ -189,9 +189,7 @@ int main() {
             }
 
         } else if (choice == 3) {
-            class Checkout{
-
-            };
+            
             cout << ">> Checkout system coming soon...\n";
 
         } else if (choice == 4) {
