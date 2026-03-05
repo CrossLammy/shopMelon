@@ -189,8 +189,9 @@ int main() {
             }
 
         } else if (choice == 3) {
-            
-            cout << ">> Checkout system coming soon...\n";
+            class Checkout{
+
+            };
 
         } else if (choice == 4) {
             Admin admin;
