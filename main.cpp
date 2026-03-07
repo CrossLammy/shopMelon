@@ -139,7 +139,7 @@ public:
 
     cout << "------------------------------------------\n";
     cout << left << setw(25) << "Subtotal:" << right << setw(12) << subtotal << " B\n";
-    cout << left << setw(25) << "Discount:" << right << setw(12) << "- " << discount << " B\n";
+    cout << left << setw(25) << "Discount:" << right << setw(3) << "- " << discount << " B\n";
     cout << "------------------------------------------\n";
     cout << left << setw(25) << "TOTAL TO PAY:" << right << setw(12) << finalTotal << " B\n";
     cout << "==========================================\n";
