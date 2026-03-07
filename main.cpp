@@ -11,7 +11,7 @@ using namespace std;
 
 class Product {
 public:
-    int id;
+    int id; 
     string name;
     double price;
 
@@ -22,7 +22,7 @@ public:
     }
     void displayProduct() const {
         std::cout << "ID: " << left << setw(5) << id
-                  << "| " << setw(30) << name
+                  << "| " << setw(30) << name 
                   << "| Price: " << fixed << setprecision(2) << price << " Bath\n";
     }
     static void showAllProduct(const vector<Product>& vecProduct) {
@@ -64,6 +64,122 @@ class Cart {
             cout <<"ID: "<< cartItems[i].id <<" - " << cartItems[i].name << " (" << cartItems[i].price << " Bath)\n";
         }
         cout << "============================================\n";
+    }
+};
+
+//add class Checkout (Cream & Carrot)
+class Checkout {
+public:
+    //Carrot add discount form file .txt
+    double applyDiscount(double total, string inputCode) {
+        ifstream file("discount_codes.txt");
+        if (!file.is_open()) {
+            cout << ">> Cannot open discount file\n";
+            return total;
+        }
+ 
+        vector<string> lines;
+        string line;
+        bool found = false;
+        int percent = 0;
+        while (getline(file, line)) {
+            int commaPos = line.find(',');
+            string code = line.substr(0, commaPos);
+            int p = stoi(line.substr(commaPos + 1));
+            if (code == inputCode) {
+                found = true;
+                percent = p;
+            }
+            else {
+                lines.push_back(line);
+            }
+        }
+
+        file.close();
+ 
+        if (!found) {
+            cout << ">> Invalid discount code\n";
+            return total;
+        }
+
+        double discount = total * percent / 100.0;
+        double finalPrice = total - discount;
+        cout << "\n>> Discount code applied!\n";
+        cout << "Discount : " << percent << "%\n";
+        cout << "You save : " << discount << " Bath\n";
+        ofstream fileOut("discount_codes.txt");
+        for (string l : lines) {
+            fileOut << l << "\n";
+        }
+
+        fileOut.close();
+        cout << ">> Code has been used and removed!\n";
+        return finalPrice;
+    }
+
+    //Cream add receipt
+    void printReceipt(const Cart& myCart, double subtotal, double discount, double finalTotal) {
+    time_t now = time(0);
+    char* dt = ctime(&now);
+
+    cout << "\n==========================================\n";
+    cout << "              OFFICIAL RECEIPT            \n";
+    cout << "==========================================\n";
+    cout << "Date: " << dt;
+    cout << "------------------------------------------\n";
+    cout << left << setw(25) << "Product" << right << setw(15) << "Price" << endl;
+    cout << "------------------------------------------\n";
+
+    for (const auto& item : myCart.cartItems) {
+        // แสดงชื่อสินค้า 22 ตัวอักษรแรก (กันชื่อยาวเกินจนบรรทัดเบี้ยว)
+        string shortName = item.name.substr(0, 22);
+        cout << left << setw(25) << shortName 
+             << right << setw(12) << fixed << setprecision(2) << item.price << " B\n";
+    }
+
+    cout << "------------------------------------------\n";
+    cout << left << setw(25) << "Subtotal:" << right << setw(12) << subtotal << " B\n";
+    cout << left << setw(25) << "Discount:" << right << setw(3) << "- " << discount << " B\n";
+    cout << "------------------------------------------\n";
+    cout << left << setw(25) << "TOTAL TO PAY:" << right << setw(12) << finalTotal << " B\n";
+    cout << "==========================================\n";
+    cout << "         THANK YOU FOR SHOPPING!          \n";
+    cout << "==========================================\n\n";
+}
+    //Cream add total price product in cart
+    void startCheckout(Cart& myCart) {
+        if (myCart.cartItems.empty()) {
+            cout << ">> Your cart is empty!\n";
+            return;
+        }
+
+        double subtotal = 0;
+        for (const auto& item : myCart.cartItems) subtotal += item.price;
+
+        myCart.showCart();
+        cout << "Total : " << fixed << setprecision(2) << subtotal << " Bath\n";
+        
+        cout << "Enter discount code (0 to skip): ";
+        string code;
+        cin >> code;
+
+        double finalTotal = subtotal;
+        if (code != "0") {
+            finalTotal = applyDiscount(subtotal, code);
+        }
+
+        cout << "Final price : " << finalTotal << " Bath\n";
+        cout << "Confirm Payment? (y/n): ";
+        char confirm;
+        cin >> confirm;
+
+        if (confirm == 'y' || confirm == 'Y') {
+            printReceipt(myCart, subtotal, (subtotal - finalTotal), finalTotal);
+            myCart.cartItems.clear();
+            cout << ">> Payment successful!\n";
+        } else {
+            cout << ">> Payment cancelled.\n";
+        }
     }
 };
 
@@ -189,8 +305,9 @@ int main() {
             }
 
         } else if (choice == 3) {
-            // Cream and carrot ทำตรงนี้
-            cout << ">> Checkout system coming soon...\n";
+        //Carroty add
+            Checkout ck;
+            ck.startCheckout(myCart);
 
         } else if (choice == 4) {
             Admin admin;
