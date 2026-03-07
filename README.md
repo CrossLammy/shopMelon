@@ -1,5 +1,6 @@
 # 🛒 คู่มือการใช้งานระบบร้านค้า (Shopping System)
-![UML](https://github.com/user-attachments/files/25812845/C.NOR%2B%2B.drawio.1-1.pdf)
+
+![UML Diagram](https://github.com/user-attachments/assets/a0562d31-f87b-4a32-99c4-8fce3102bc64)
 
 ---
 
