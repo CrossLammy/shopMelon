@@ -1,8 +1,6 @@
 # 🛒 คู่มือการใช้งานระบบร้านค้า (Shopping System)
 
-![UML Diagram](https://github.com/user-attachments/assets/a0562d31-f87b-4a32-99c4-8fce3102bc64)
-
----
+![UML Diagram](https://github.com/user-attachments/assets/62588b6d-acba-4dac-a4ab-cb01595658ba)
 
 ## 📋 สารบัญ
 1. [ภาพรวมของระบบ](#ภาพรวมของระบบ)
