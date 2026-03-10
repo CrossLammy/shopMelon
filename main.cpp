@@ -11,7 +11,7 @@ using namespace std;
 
 class Product {
 public:
-    int id; 
+    int id;
     string name;
     double price;
 
@@ -22,8 +22,15 @@ public:
     }
     void displayProduct() const {
         std::cout << "ID: " << left << setw(5) << id
-                  << "| " << setw(30) << name 
+                  << "| " << setw(30) << name
                   << "| Price: " << fixed << setprecision(2) << price << " Bath\n";
+    }
+
+    void displayProduct(string note) const {
+        std::cout << "ID: " << left << setw(5) << id
+                  << "| " << setw(30) << name
+                  << "| Price: " << fixed << setprecision(2) << price << " Bath"
+                  << "  [" << note << "]\n";
     }
     static void showAllProduct(const vector<Product>& vecProduct) {
         cout << "================== STORE INVENTORY ==================" << endl;
@@ -43,6 +50,17 @@ class Cart {
         cout << ">> Added --> [" << p.name << "] to cart!\n";
     }
 
+    void addProduct(int id, const vector<Product>& storeProducts) {
+        for (const auto& p : storeProducts) {
+            if (p.id == id) {
+                cartItems.push_back(p);
+                cout << ">> Added --> [" << p.name << "] to cart!\n";
+                return;
+            }
+        }
+        cout << ">> There is no product code for this product\n";
+    }
+
     void removeProduct(int productId) {
         for (auto it = cartItems.begin(); it != cartItems.end(); ++it) {
             if (it->id == productId) {
@@ -52,6 +70,15 @@ class Cart {
             }
         }
         cout << ">> Cart is empty or Product not found in cart\n";
+    }
+
+    void clearCart() {
+        if (cartItems.empty()) {
+            cout << ">> Cart is empty\n";
+            return;
+        }
+        cartItems.clear();
+        cout << " >> Cart has been cleared.\n";
     }
 
     void showCart() {
@@ -67,17 +94,16 @@ class Cart {
     }
 };
 
-//add class Checkout (Cream & Carrot)
-class Checkout {
+
+class Checkout : public Cart {
 public:
-    //Carrot add discount form file .txt
     double applyDiscount(double total, string inputCode) {
         ifstream file("discount_codes.txt");
         if (!file.is_open()) {
             cout << ">> Cannot open discount file\n";
             return total;
         }
- 
+
         vector<string> lines;
         string line;
         bool found = false;
@@ -96,7 +122,7 @@ public:
         }
 
         file.close();
- 
+
         if (!found) {
             cout << ">> Invalid discount code\n";
             return total;
@@ -117,7 +143,6 @@ public:
         return finalPrice;
     }
 
-    //Cream add receipt
     void printReceipt(const Cart& myCart, double subtotal, double discount, double finalTotal) {
     time_t now = time(0);
     char* dt = ctime(&now);
@@ -131,9 +156,8 @@ public:
     cout << "------------------------------------------\n";
 
     for (const auto& item : myCart.cartItems) {
-        // แสดงชื่อสินค้า 22 ตัวอักษรแรก (กันชื่อยาวเกินจนบรรทัดเบี้ยว)
         string shortName = item.name.substr(0, 22);
-        cout << left << setw(25) << shortName 
+        cout << left << setw(25) << shortName
              << right << setw(12) << fixed << setprecision(2) << item.price << " B\n";
     }
 
@@ -146,11 +170,22 @@ public:
     cout << "         THANK YOU FOR SHOPPING!          \n";
     cout << "==========================================\n\n";
 }
-    //Cream add total price product in cart
-    void startCheckout(Cart& myCart) {
+
+    void startCheckout(Cart& myCart, const vector<Product>& storeProducts) {
         if (myCart.cartItems.empty()) {
             cout << ">> Your cart is empty!\n";
-            return;
+            srand(time(0));
+            int randIndex = rand() % storeProducts.size();
+            cout << ">> Suggested: ";
+            storeProducts[randIndex].displayProduct("SUGGESTED!");
+            cout << ">> Add to cart? (y/n): ";
+            char suggest;
+            cin >> suggest;
+            if (suggest == 'y' || suggest == 'Y') {
+                myCart.addProduct(storeProducts[randIndex]);
+            } else {
+                return;
+            }
         }
 
         double subtotal = 0;
@@ -158,7 +193,7 @@ public:
 
         myCart.showCart();
         cout << "Total : " << fixed << setprecision(2) << subtotal << " Bath\n";
-        
+
         cout << "Enter discount code (0 to skip): ";
         string code;
         cin >> code;
@@ -194,6 +229,13 @@ public:
             return true;
         }
         return false;
+    }
+};
+
+class AdminUser : public Admin {
+public:
+    void showWelcome() {
+        cout << ">> Login successful! Welcome Admin.\n";
     }
 };
 
@@ -247,7 +289,7 @@ int main() {
                 myCart.showCart();
 
                 int shopChoice;
-                cout << "\n[1] add  [2] remove  [0] back\n";
+                cout << "\n[1] add  [2] remove  [3] clearCart  [0] back\n";
                 cout << "Select menu : ";
                 cin >> shopChoice;
 
@@ -270,21 +312,14 @@ int main() {
                         continue;
                     }
 
-                    bool found = false;
-                    for (int i = 0; i < (int)storeProducts.size(); i++) {
-                        if (storeProducts[i].id == p_id) {
-                            myCart.addProduct(storeProducts[i]);
-                            found = true; break;
-                        }
-                    }
-                    if (!found) cout << ">> There is no product code for this product\n";
+                    myCart.addProduct(p_id, storeProducts);
 
                 } else if (shopChoice == 2) {
                     if (myCart.cartItems.empty()) {
                         cout << ">> The basket is empty; there are no items to remove\n";
                     } else {
                         int p_id;
-                        cout << ">> Enter remove product : ";
+                        cout << ">> Enter remove product ID: ";
                         cin >> p_id;
 
                         if (cin.fail()) {
@@ -296,7 +331,20 @@ int main() {
                         myCart.removeProduct(p_id);
                     }
 
-                } else if (shopChoice == 0) {
+                } else if (shopChoice == 3) {
+                    if (myCart.cartItems.empty()) {
+                        cout << ">> Cart is already empty\n";
+                    } else {
+                        cout << ">> Are you sure? (y/n): ";
+                        char sure;
+                        cin >> sure;
+                        if (sure == 'y' || sure == 'Y') {
+                            myCart.clearCart();
+                        } else {
+                            cout << ">> Cancelled.\n";
+                        }
+                    }
+                }else if (shopChoice == 0) {
                     cout << ">> Back...\n";
                     break;
                 } else {
@@ -305,12 +353,12 @@ int main() {
             }
 
         } else if (choice == 3) {
-        //Carroty add
             Checkout ck;
-            ck.startCheckout(myCart);
+            ck.startCheckout(myCart, storeProducts);
 
         } else if (choice == 4) {
-            Admin admin;
+            // [ข้อ 6 - ใช้ AdminUser แทน Admin]
+            AdminUser admin;
             string u, p;
 
             cout << "\n========== ADMIN LOGIN ==========\n";
@@ -320,7 +368,7 @@ int main() {
             cin >> p;
 
             if (admin.login(u, p)) {
-                cout << ">> Login successful! Welcome Admin.\n";
+                admin.showWelcome();
                 bool adminRunning = true;
                 while (adminRunning) {
                     cout << "\n[1] Random discount code\n";
